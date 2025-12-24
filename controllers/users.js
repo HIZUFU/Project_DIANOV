@@ -23,12 +23,14 @@ const login = async (req,res) => {
     });
 
     const isPasswordCorrect = user && (await bcrypt.compare(password, user.password));
+    const secret = process.env.JWT_SECRET;
 
-    if (user && isPasswordCorrect) {
+    if (user && isPasswordCorrect && secret) {
         res.status(200).json({
             id: user.id,
             email: user.email,
             name: user.name,
+            token: jwt.sign({id: user.id}, secret, {expiresIn: '30d'})
         })
     } else {
         return res.status(400).json({message: 'Неверно введен логин или пароль'})
@@ -70,7 +72,7 @@ const register = async (req,res) => {
     const secret = process.env.JWT_SECRET;
 
     if (user && secret){
-        res.status(201).json({
+        return res.status(201).json({
             id: user.id,
             email: user.email,
             name,
