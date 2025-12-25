@@ -12,6 +12,7 @@ model User {
   password        String
   name            String
   createdEmployee  Post[]
+  studentProfile  Student[]
 }
 
 model Post {
@@ -20,4 +21,34 @@ model Post {
   content   String
   userId    String
   user      User     @relation(fields: [userId], references: [id])
+}
+
+model Student{
+  id        String  @id @default(uuid())
+  userId    String  @unique  // Должен быть unique для 1:1 связи!
+  user      User    @relation(fields: [userId], references: [id])
+}
+
+model history_application{
+  id String @id @default(uuid())
+}
+
+model skills_stydent{
+  id String @id @default(uuid())
+}
+
+model interviews{
+  id String @id @default(uuid())
+}
+
+model vacancy_skills{
+  id String @id @default(uuid())
+}
+
+model reviews{//отзывы
+  id String @id @default(uuid())
+}
+
+model work_schedule{//график работы
+  id String @id @default(uuid())
 }

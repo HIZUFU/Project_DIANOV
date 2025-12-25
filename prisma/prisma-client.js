@@ -7,3 +7,7 @@ const adapter = new PrismaBetterSqlite3({
 
 const prisma = new PrismaClient({ adapter });
 module.exports = prisma;
+
+module.exports = {
+  prisma
+}
