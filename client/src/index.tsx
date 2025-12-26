@@ -1,12 +1,12 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
-import { store } from './app/store.ts';
-import reportWebVitals from './reportWebVitals.ts';
+import { store } from './app/store';
+import reportWebVitals from './reportWebVitals';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import { Paths } from './paths.ts'
-import { Login } from './pages/login/index.tsx';
-import { Register } from './pages/register/index.tsx';
+import { Paths } from './paths'
+import { Login } from './pages/login/index';
+import { Register } from './pages/register/index';
 import './index.css';
 import { ConfigProvider, theme } from 'antd';
 

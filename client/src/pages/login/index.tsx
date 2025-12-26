@@ -1,5 +1,5 @@
 import React from 'react'
-import { Layout } from '../../components/Layout/index.tsx';
+import { Layout } from '../../components/Layout/index';
 
 export const Login = () => {
   return (

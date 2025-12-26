@@ -7,48 +7,165 @@ generator client {
 }
 
 model User {
-  id              String     @id @default(uuid())
-  email           String
-  password        String
-  name            String
-  createdEmployee  Post[]
-  studentProfile  Student[]
+  id            String    @id @default(cuid())
+  email         String    @unique
+  password      String
+  role          String    // 'student' or 'organization'
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  profile       Profile?
+  sentMessages  Message[] @relation("SenderMessages")
+  receivedMessages Message[] @relation("ReceiverMessages")
 }
 
-model Post {
-  id        String   @id @default(uuid())
-  title     String
-  content   String
-  userId    String
+model Profile {
+  id        String   @id @default(cuid())
+  userId    String   @unique
   user      User     @relation(fields: [userId], references: [id])
+  fullName  String
+  avatar    String?
+  phone     String?
+  
+  studentProfile   StudentProfile?
+  organizationProfile OrganizationProfile?
 }
 
-model Student{
-  id        String  @id @default(uuid())
-  userId    String  @unique  // Должен быть unique для 1:1 связи!
-  user      User    @relation(fields: [userId], references: [id])
+model StudentProfile {
+  id        String   @id @default(cuid())
+  profileId String   @unique
+  profile   Profile  @relation(fields: [profileId], references: [id])
+  university String
+  faculty    String
+  course     Int
+  
+  // Вместо String[] используем связь с отдельной таблицей
+  skills     StudentSkill[]
+  resume    Resume?
+  applications Application[]
 }
 
-model history_application{
-  id String @id @default(uuid())
+// НОВАЯ ТАБЛИЦА: Навыки студента
+model StudentSkill {
+  id        String   @id @default(cuid())
+  studentId String
+  student   StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  skill     String
+  level     String   // 'beginner', 'intermediate', 'advanced'
+  
+  @@unique([studentId, skill])  // Один навык - одна запись
 }
 
-model skills_stydent{
-  id String @id @default(uuid())
+model OrganizationProfile {
+  id          String   @id @default(cuid())
+  profileId   String   @unique
+  profile     Profile  @relation(fields: [profileId], references: [id])
+  companyName String
+  description String?
+  website     String?
+  logo        String?
+  
+  vacancies   Vacancy[]
 }
 
-model interviews{
-  id String @id @default(uuid())
+model Resume {
+  id              String   @id @default(cuid())
+  studentId       String   @unique
+  student         StudentProfile @relation(fields: [studentId], references: [id])
+  title           String
+  experience      String
+  education       String
+  projects        String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  skills         ResumeSkill[]
 }
 
-model vacancy_skills{
-  id String @id @default(uuid())
+model ResumeSkill {
+  id        String   @id @default(cuid())
+  resumeId  String
+  resume    Resume   @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+  skill     String
+  level     String   // 'beginner', 'intermediate', 'advanced'
+  
+  @@unique([resumeId, skill])
 }
 
-model reviews{//отзывы
-  id String @id @default(uuid())
+model Vacancy {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  salaryFrom  Int?
+  salaryTo    Int?
+  location    String
+  remote      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  organizationId String
+  organization   OrganizationProfile @relation(fields: [organizationId], references: [id])
+  
+  skills      VacancySkill[]
+  applications Application[]
 }
 
-model work_schedule{//график работы
-  id String @id @default(uuid())
+model VacancySkill {
+  id         String   @id @default(cuid())
+  vacancyId  String
+  vacancy    Vacancy  @relation(fields: [vacancyId], references: [id], onDelete: Cascade)
+  skill      String
+  importance String   // 'required', 'preferred', 'optional'
+  
+  @@unique([vacancyId, skill])
+}
+
+model Application {
+  id          String   @id @default(cuid())
+  status      String   @default("pending") // pending, reviewed, accepted, rejected
+  coverLetter String?
+  appliedAt   DateTime @default(now())
+  
+  studentId   String
+  student     StudentProfile @relation(fields: [studentId], references: [id])
+  
+  vacancyId   String
+  vacancy     Vacancy @relation(fields: [vacancyId], references: [id])
+  
+  interviews  Interview[]
+  
+  @@unique([studentId, vacancyId])
+}
+
+model Interview {
+  id            String   @id @default(cuid())
+  applicationId String
+  application   Application @relation(fields: [applicationId], references: [id])
+  scheduledFor  DateTime
+  type          String   // 'online', 'in_person'
+  location      String?
+  meetingLink   String?
+  status        String   @default("scheduled") // scheduled, completed, cancelled
+  notes         String?
+  
+  createdAt     DateTime @default(now())
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  content   String
+  createdAt DateTime @default(now())
+  read      Boolean  @default(false)
+  
+  senderId  String
+  sender    User     @relation("SenderMessages", fields: [senderId], references: [id])
+  
+  receiverId String
+  receiver   User     @relation("ReceiverMessages", fields: [receiverId], references: [id])
+}
+
+model Skill {
+  id    String @id @default(cuid())
+  name  String @unique
+  category String
 }

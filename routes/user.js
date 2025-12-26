@@ -11,4 +11,4 @@ router.post('/register', register);
 //* /api/user/current
 router.get('/current', auth, current);
 
-module.exports = router;
+module.exports = router; 

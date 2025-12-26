@@ -1,6 +1,6 @@
 import { Layout as AntLayout} from "antd";
-import styles from "./index.module.css";
-import { Header } from "../header/index.tsx";
+import styles from './index.module.css';
+import { Header } from "../header/index";
 
 type Props = {
   children: React.ReactNode;
